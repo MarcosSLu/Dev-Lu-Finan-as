@@ -1,10 +1,59 @@
-import React from "react";
+import React, { useContext, useState } from "react";
+import { Platform } from 'react-native'
 import { Text, View } from "react-native";
 
+import { Background, Container, AreaInput, Input, SubmitButton, SubmitText } from '../SignIn/styles'
+import { AuthContext } from "../../contexts/auth";
+
 export default function SignUp() {
+
+    const { signUp } = useContext(AuthContext)
+    const [nome, setNome] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+
+    function handleSignUp() {
+        signUp(email, password, nome)
+    }
     return (
-        <View>
-            <Text>Tela SignUp</Text>
-        </View>
+        <Background>
+            <Container
+                behavior={Platform.OS === 'ios' ? 'padding' : ''}
+                enabled
+            >
+                <AreaInput>
+                    <Input
+                        placeholder="Digite seu nome"
+                        value={nome}
+                        onChangeText={(text) => setNome(text)}
+                    />
+                </AreaInput>
+
+                <AreaInput>
+                    <Input
+                        placeholder="Digite seu e-mail"
+                        value={email}
+                        //O lowercase é improviso pra deixxar todas minúsculas
+                        
+                        onChangeText={(text) => setEmail(text.toLowerCase())}
+                        autoCapitalize="none"
+                    />
+                </AreaInput>
+
+                <AreaInput>
+                    <Input
+                        placeholder="Digite sua senha"
+                        value={password}
+                        onChangeText={(text) => setPassword(text)}
+                        secureTextEntry={true}
+                    />
+                </AreaInput>
+
+                <SubmitButton onPress={handleSignUp}>
+                    <SubmitText>Cadastrar</SubmitText>
+                </SubmitButton>
+
+            </Container>
+        </Background>
     );
 }
