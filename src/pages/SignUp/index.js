@@ -13,6 +13,9 @@ export default function SignUp() {
     const [password, setPassword] = useState('')
 
     function handleSignUp() {
+
+        if(nome === '' || email === '' || password === '')return
+
         signUp(email, password, nome)
     }
     return (
@@ -34,7 +37,6 @@ export default function SignUp() {
                         placeholder="Digite seu e-mail"
                         value={email}
                         //O lowercase é improviso pra deixxar todas minúsculas
-                        
                         onChangeText={(text) => setEmail(text.toLowerCase())}
                         autoCapitalize="none"
                     />
