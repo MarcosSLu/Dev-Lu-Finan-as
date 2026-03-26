@@ -37,7 +37,7 @@ export default function SignUp() {
                         placeholder="Digite seu e-mail"
                         value={email}
                         //O lowercase é improviso pra deixxar todas minúsculas
-                        onChangeText={(text) => setEmail(text.toLowerCase())}
+                        onChangeText={(text) => setEmail(text.toLowerCase().trim())}
                         autoCapitalize="none"
                     />
                 </AreaInput>
