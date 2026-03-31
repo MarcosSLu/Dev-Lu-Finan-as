@@ -1,46 +1,72 @@
-import React, {createContext, useState} from "react";
+import React, { createContext, useState, useEffect } from "react";
 
 import api from "../services/api";
 import { useNavigation } from "@react-navigation/native";
 
-export  const  AuthContext  = createContext({})
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function AuthProvider({children}){
-    const[user, setUser] = useState(null)
+export const AuthContext = createContext({})
+
+export default function AuthProvider({ children }) {
+    const [user, setUser] = useState(null)
     const [loadingAuth, setLoadingAuth] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     const navigation = useNavigation()
 
+    useEffect(() => {
+        async function loadStorege() {
+            const storegeUser = await AsyncStorage.getItem('@finToken')
 
-    async function signUp(email, password, nome){
+            if (storegeUser) {
+                const response = await api.get('/me', {
+                    headers: {
+                        'Authorization': `Bearer ${storegeUser}`
+                    }
+                })
+                    .catch(() => {
+                        setUser(null)
+                    })
+                api.defaults.headers['Authorization'] = `Bearer ${storegeUser}`
+                setUser(response.data)
+                setLoading(false)
+            }
+            setLoading(false)
+        }
+
+        loadStorege()
+    }, [])
+
+
+    async function signUp(email, password, nome) {
         setLoadingAuth(true)
 
-        try{
+        try {
             const response = await api.post('/users', {
                 name: nome,
                 password: password,
                 email: email,
             })
             setLoadingAuth(false)
-            
+
             navigation.goBack()
-            
-        }catch(erro){
+
+        } catch (erro) {
             console.log('Erro ao cadastrar!', erro.response?.data)
             setLoadingAuth(false)
         }
     }
 
-    async function signIn(email, password){
+    async function signIn(email, password) {
         setLoadingAuth(true)
 
-        try{
+        try {
             const response = await api.post('/login', {
                 email: email,
                 password: password,
             })
 
-            const {id, name, token} = response.data
+            const { id, name, token } = response.data
 
             const data = {
                 id,
@@ -49,24 +75,27 @@ export default function AuthProvider({children}){
                 email,
             }
 
+            await AsyncStorage.setItem('@finToken', token)
+
             api.defaults.headers['Authorization'] = `Bearer ${token}`
 
+
             setUser({
-                id, 
+                id,
                 name,
                 email
             })
 
             setLoadingAuth(false)
 
-        }catch(erro){
+        } catch (erro) {
             console.log('Erro ao logar: ', erro)
             setLoadingAuth(false)
         }
     }
 
-    return(
-        <AuthContext.Provider value={{ signed: !!user, user, signUp, signIn, loadingAuth}}>
+    return (
+        <AuthContext.Provider value={{ signed: !!user, user, signUp, signIn, loadingAuth, loading }}>
             {children}
         </AuthContext.Provider>
     )

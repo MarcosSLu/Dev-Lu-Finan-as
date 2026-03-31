@@ -6,12 +6,25 @@ import { AuthContext } from "../contexts/auth";
 import AuthRoutes from "./auth.routes";
 import AppRoutes from "./app.routes";
 
-export default function Routes(){
-    const { signed } = useContext(AuthContext)
+export default function Routes() {
+    const { signed, loading } = useContext(AuthContext)
 
-    const loading = false;
 
-    return(
-        signed ?  <AppRoutes/> : <AuthRoutes />
+    if (loading === true) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#F0F4FF'
+                }}
+            >
+                <ActivityIndicator size='#large' color='#131313'/>
+            </View>
+        )
+    }
+    return (
+        signed ? <AppRoutes /> : <AuthRoutes />
     )
 }
